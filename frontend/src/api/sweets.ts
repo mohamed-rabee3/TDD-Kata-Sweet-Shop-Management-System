@@ -12,6 +12,7 @@ export interface Sweet {
 export interface SearchParams {
     q?: string;
     category?: string;
+    price_min?: string;
     price_max?: string;
 }
 
@@ -41,5 +42,10 @@ export const deleteSweet = async (id: number) => {
 
 export const restockSweet = async (id: number, amount: number) => {
     const response = await api.post(`/api/sweets/${id}/restock`, { amount });
+    return response.data;
+};
+
+export const updateSweet = async (id: number, data: Partial<Omit<Sweet, 'id'>>) => {
+    const response = await api.put(`/api/sweets/${id}`, data);
     return response.data;
 };

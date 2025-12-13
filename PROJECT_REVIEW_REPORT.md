@@ -284,9 +284,10 @@ This report provides a comprehensive analysis of the Sweet Shop Management Syste
      - Update `SearchParams` interface to include `price_min`
      - Pass price parameters to search API
 
+
 ### 4.2 Minor Issues
 
-4. **Test Report Missing** ❌
+<!-- 4. **Test Report Missing** ❌
    - **Issue:** No test coverage report file
    - **Impact:** Cannot verify test coverage percentage
    - **Fix Required:** Generate and include test coverage report
@@ -310,7 +311,7 @@ This report provides a comprehensive analysis of the Sweet Shop Management Syste
    - **Issue:** `auth.router` is registered twice in `main.py` (lines 8 and 25)
    - **Impact:** Minor code quality issue
    - **Location:** `backend/app/main.py`
-   - **Fix Required:** Remove duplicate registration
+   - **Fix Required:** Remove duplicate registration -->
 
 ---
 

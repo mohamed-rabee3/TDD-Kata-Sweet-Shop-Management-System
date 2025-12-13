@@ -31,33 +31,174 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ccc' }}>
-            <h2>Login</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>Email:</label>
-                    <input 
-                        type="email" 
-                        value={email} 
-                        onChange={(e) => setEmail(e.target.value)} 
-                        required 
-                        style={{ width: '100%', padding: '8px' }}
-                    />
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            overflowY: 'auto'
+        }}>
+            <div style={{
+                maxWidth: '450px',
+                width: '100%',
+                background: 'white',
+                borderRadius: '16px',
+                padding: '40px',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+            }}>
+                <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                    <div style={{ fontSize: '4rem', marginBottom: '10px' }}>🍬</div>
+                    <h2 style={{
+                        margin: 0,
+                        fontSize: '2rem',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        fontWeight: 'bold'
+                    }}>
+                        Welcome Back!
+                    </h2>
+                    <p style={{ color: '#666', marginTop: '10px' }}>Sign in to your Sweet Shop account</p>
                 </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>Password:</label>
-                    <input 
-                        type="password" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} 
-                        required 
-                        style={{ width: '100%', padding: '8px' }}
-                    />
-                </div>
-                <button type="submit" style={{ padding: '10px 20px' }}>Login</button>
-            </form>
-            <p>Don't have an account? <Link to="/register">Register here</Link></p>
+
+                {error && (
+                    <div style={{
+                        padding: '12px',
+                        background: '#fee',
+                        border: '2px solid #dc3545',
+                        borderRadius: '8px',
+                        color: '#dc3545',
+                        marginBottom: '20px',
+                        textAlign: 'center',
+                        fontWeight: '500'
+                    }}>
+                        ⚠️ {error}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit}>
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{
+                            display: 'block',
+                            marginBottom: '8px',
+                            color: '#333',
+                            fontWeight: '600',
+                            fontSize: '0.9rem'
+                        }}>
+                            📧 Email Address
+                        </label>
+                        <input 
+                            type="email" 
+                            value={email} 
+                            onChange={(e) => setEmail(e.target.value)} 
+                            required 
+                            placeholder="Enter your email"
+                            style={{
+                                width: '100%',
+                                padding: '12px 15px',
+                                border: '2px solid #e0e0e0',
+                                borderRadius: '8px',
+                                fontSize: '1rem',
+                                transition: 'all 0.3s ease',
+                                outline: 'none',
+                                boxSizing: 'border-box'
+                            }}
+                            onFocus={(e) => {
+                                e.currentTarget.style.borderColor = '#667eea';
+                                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                            }}
+                            onBlur={(e) => {
+                                e.currentTarget.style.borderColor = '#e0e0e0';
+                                e.currentTarget.style.boxShadow = 'none';
+                            }}
+                        />
+                    </div>
+                    <div style={{ marginBottom: '25px' }}>
+                        <label style={{
+                            display: 'block',
+                            marginBottom: '8px',
+                            color: '#333',
+                            fontWeight: '600',
+                            fontSize: '0.9rem'
+                        }}>
+                            🔒 Password
+                        </label>
+                        <input 
+                            type="password" 
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)} 
+                            required 
+                            placeholder="Enter your password"
+                            style={{
+                                width: '100%',
+                                padding: '12px 15px',
+                                border: '2px solid #e0e0e0',
+                                borderRadius: '8px',
+                                fontSize: '1rem',
+                                transition: 'all 0.3s ease',
+                                outline: 'none',
+                                boxSizing: 'border-box'
+                            }}
+                            onFocus={(e) => {
+                                e.currentTarget.style.borderColor = '#667eea';
+                                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                            }}
+                            onBlur={(e) => {
+                                e.currentTarget.style.borderColor = '#e0e0e0';
+                                e.currentTarget.style.boxShadow = 'none';
+                            }}
+                        />
+                    </div>
+                    <button 
+                        type="submit" 
+                        style={{
+                            width: '100%',
+                            padding: '14px',
+                            backgroundColor: '#667eea',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '1.1rem',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            boxShadow: '0 4px 6px rgba(102, 126, 234, 0.3)',
+                            marginBottom: '20px'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#5568d3';
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = '0 6px 12px rgba(102, 126, 234, 0.4)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#667eea';
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = '0 4px 6px rgba(102, 126, 234, 0.3)';
+                        }}
+                    >
+                         Login
+                    </button>
+                </form>
+                <p style={{ textAlign: 'center', color: '#666', margin: 0 }}>
+                    Don't have an account?{' '}
+                    <Link 
+                        to="/register" 
+                        style={{
+                            color: '#667eea',
+                            fontWeight: '600',
+                            textDecoration: 'none'
+                        }}
+                    >
+                        Register here
+                    </Link>
+                </p>
+            </div>
         </div>
     );
 };
