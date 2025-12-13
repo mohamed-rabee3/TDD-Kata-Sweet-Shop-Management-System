@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getSweets, purchaseSweet, type Sweet } from '../api/sweets';
 import SweetCard from '../components/SweetCard';
 
 const Dashboard: React.FC = () => {
     const { logout, user } = useAuth();
+    const navigate = useNavigate();
     const [sweets, setSweets] = useState<Sweet[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -56,11 +58,21 @@ const Dashboard: React.FC = () => {
     };
 
     return (
+
         <div style={{ padding: '20px' }}>
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h1>Sweet Shop 🍬</h1>
                 <div>
+                    {/* Only show this button if user is admin */}
+                    {user?.is_admin && (
+                        <button 
+                            onClick={() => navigate('/admin')} 
+                            style={{ marginRight: '15px', backgroundColor: '#6c757d', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer' }}
+                        >
+                            Admin Panel
+                        </button>
+                    )}
                     <span>Welcome, {user?.sub}</span>
                     <button onClick={logout} style={{ marginLeft: '15px', padding: '5px 10px' }}>Logout</button>
                 </div>
@@ -104,7 +116,10 @@ const Dashboard: React.FC = () => {
                 </div>
             )}
         </div>
+        
+        
     );
+    
 };
 
 export default Dashboard;

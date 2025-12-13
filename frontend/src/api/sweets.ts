@@ -29,3 +29,17 @@ export const purchaseSweet = async (id: number) => {
     const response = await api.post(`/sweets/${id}/purchase`);
     return response.data;
 };
+
+export const createSweet = async (data: Omit<Sweet, 'id'>) => {
+    const response = await api.post('/sweets/', data);
+    return response.data;
+};
+
+export const deleteSweet = async (id: number) => {
+    await api.delete(`/sweets/${id}`);
+};
+
+export const restockSweet = async (id: number, amount: number) => {
+    const response = await api.post(`/sweets/${id}/restock`, { amount });
+    return response.data;
+};

@@ -5,6 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 interface User {
     sub: string; // The email is stored in the 'sub' claim
     exp: number;
+    is_admin: boolean;
 }
 
 // Define the shape of our Context
