@@ -8,7 +8,7 @@ from app.config import settings
 
 # This tells FastAPI that the client should send the token in the Authorization header
 # and where to go to get a token if they don't have one.
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
 def get_current_user(
     token: str = Depends(oauth2_scheme), 

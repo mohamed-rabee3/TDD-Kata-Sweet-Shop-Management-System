@@ -6,7 +6,7 @@ from typing import Optional
 from app import database, models, schemas, dependencies
 
 router = APIRouter(
-    prefix="/sweets",
+    prefix="/api/sweets",
     tags=["Sweets"]
 )
 

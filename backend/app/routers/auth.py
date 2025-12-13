@@ -7,7 +7,7 @@ from datetime import timedelta
 from app.config import settings  # Add this import
 
 router = APIRouter(
-    prefix="/auth",
+    prefix="/api/auth",
     tags=["Authentication"]
 )
 

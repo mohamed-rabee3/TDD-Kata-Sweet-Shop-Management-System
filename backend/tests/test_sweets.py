@@ -4,7 +4,7 @@ from app import models
 # --- Helper: Create tokens for testing ---
 def get_admin_token(client):
     # 1. Register admin
-    client.post("/auth/register", json={"email": "admin@test.com", "password": "pass"})
+    client.post("/api/auth/register", json={"email": "admin@test.com", "password": "pass"})
     # 2. Force DB update to make them admin (since API doesn't allow registering as admin)
     # Note: We rely on the fixture logic or we can cheat slightly for tests by using a script/fixture
     # But for simplicity in this unit test file, we will just login the user we created
@@ -23,7 +23,7 @@ def get_admin_token(client):
 
 def test_create_sweet_as_admin(client, test_db):
     # 1. Create User
-    client.post("/auth/register", json={"email": "admin@test.com", "password": "pass"})
+    client.post("/api/auth/register", json={"email": "admin@test.com", "password": "pass"})
     
     # 2. Make them Admin manually in DB
     user = test_db.query(models.User).filter(models.User.email == "admin@test.com").first()
@@ -32,7 +32,7 @@ def test_create_sweet_as_admin(client, test_db):
     
     # 3. Login
     login_res = client.post(
-        "/auth/login", 
+        "/api/auth/login", 
         data={"username": "admin@test.com", "password": "pass"},
         headers={"content-type": "application/x-www-form-urlencoded"}
     )
@@ -40,7 +40,7 @@ def test_create_sweet_as_admin(client, test_db):
     
     # 4. Try to Create Sweet
     response = client.post(
-        "/sweets",
+        "/api/sweets",
         json={
             "name": "Super Chocolate",
             "category": "Chocolate",
@@ -57,11 +57,11 @@ def test_create_sweet_as_admin(client, test_db):
 
 def test_create_sweet_as_normal_user_fails(client):
     # 1. Register normal user
-    client.post("/auth/register", json={"email": "user@test.com", "password": "pass"})
+    client.post("/api/auth/register", json={"email": "user@test.com", "password": "pass"})
     
     # 2. Login
     login_res = client.post(
-        "/auth/login", 
+        "/api/auth/login", 
         data={"username": "user@test.com", "password": "pass"},
         headers={"content-type": "application/x-www-form-urlencoded"}
     )
@@ -69,7 +69,7 @@ def test_create_sweet_as_normal_user_fails(client):
     
     # 3. Try to Create Sweet (Should Fail)
     response = client.post(
-        "/sweets",
+        "/api/sweets",
         json={"name": "Hacker Candy", "category": "Bad", "price": 0, "quantity": 0},
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -79,13 +79,13 @@ def test_create_sweet_as_normal_user_fails(client):
 def test_restock_sweet(client, test_db):
     # 1. Setup Admin & Sweet
     # (Reuse admin creation logic or separate it into a fixture later)
-    client.post("/auth/register", json={"email": "admin2@test.com", "password": "pass"})
+    client.post("/api/auth/register", json={"email": "admin2@test.com", "password": "pass"})
     user = test_db.query(models.User).filter(models.User.email == "admin2@test.com").first()
     user.is_admin = True
     test_db.commit()
     
     login_res = client.post(
-        "/auth/login", 
+        "/api/auth/login", 
         data={"username": "admin2@test.com", "password": "pass"},
         headers={"content-type": "application/x-www-form-urlencoded"}
     )
@@ -93,7 +93,7 @@ def test_restock_sweet(client, test_db):
     
     # Create a sweet first
     create_res = client.post(
-        "/sweets",
+        "/api/sweets",
         json={"name": "Jelly Bean", "category": "Gummy", "price": 1.0, "quantity": 5},
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -101,7 +101,7 @@ def test_restock_sweet(client, test_db):
     
     # 2. Restock (Add 10 more)
     response = client.post(
-        f"/sweets/{sweet_id}/restock",
+        f"/api/sweets/{sweet_id}/restock",
         json={"amount": 10}, # We assume we will implement a schema for this
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -120,7 +120,7 @@ def test_get_sweets_list(client, test_db):
     test_db.commit()
 
     # 2. Get List (No Token needed)
-    response = client.get("/sweets")
+    response = client.get("/api/sweets")
     
     assert response.status_code == 200
     data = response.json()
@@ -136,27 +136,27 @@ def test_search_sweets(client, test_db):
     test_db.commit()
 
     # 2. Search by Name (partial match)
-    res_name = client.get("/sweets/search?q=Dark")
+    res_name = client.get("/api/sweets/search?q=Dark")
     assert res_name.status_code == 200
     assert len(res_name.json()) == 1
     assert res_name.json()[0]["name"] == "Dark Chocolate"
 
     # 3. Search by Category
-    res_cat = client.get("/sweets/search?category=Gummy")
+    res_cat = client.get("/api/sweets/search?category=Gummy")
     assert len(res_cat.json()) == 1
     assert res_cat.json()[0]["name"] == "Sour Worms"
 
     # 4. Search by Price Range
-    res_price = client.get("/sweets/search?price_max=5.0")
+    res_price = client.get("/api/sweets/search?price_max=5.0")
     assert len(res_price.json()) == 1
     assert res_price.json()[0]["name"] == "Sour Worms"
 
 
 def test_purchase_sweet_success(client, test_db):
     # 1. Setup: User and Sweet
-    client.post("/auth/register", json={"email": "buyer@test.com", "password": "pass"})
+    client.post("/api/auth/register", json={"email": "buyer@test.com", "password": "pass"})
     login_res = client.post(
-        "/auth/login", 
+        "/api/auth/login", 
         data={"username": "buyer@test.com", "password": "pass"},
         headers={"content-type": "application/x-www-form-urlencoded"}
     )
@@ -170,7 +170,7 @@ def test_purchase_sweet_success(client, test_db):
     
     # 2. Purchase 1 item
     response = client.post(
-        f"/sweets/{sweet.id}/purchase",
+        f"/api/sweets/{sweet.id}/purchase",
         headers={"Authorization": f"Bearer {token}"}
     )
     
@@ -184,9 +184,9 @@ def test_purchase_sweet_success(client, test_db):
 
 def test_purchase_out_of_stock(client, test_db):
     # 1. Setup: User and Sweet with 0 Quantity
-    client.post("/auth/register", json={"email": "late@test.com", "password": "pass"})
+    client.post("/api/auth/register", json={"email": "late@test.com", "password": "pass"})
     login_res = client.post(
-        "/auth/login", 
+        "/api/auth/login", 
         data={"username": "late@test.com", "password": "pass"},
         headers={"content-type": "application/x-www-form-urlencoded"}
     )
@@ -199,7 +199,7 @@ def test_purchase_out_of_stock(client, test_db):
     
     # 2. Try to Purchase
     response = client.post(
-        f"/sweets/{sweet.id}/purchase",
+        f"/api/sweets/{sweet.id}/purchase",
         headers={"Authorization": f"Bearer {token}"}
     )
     

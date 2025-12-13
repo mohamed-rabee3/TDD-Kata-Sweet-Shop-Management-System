@@ -18,7 +18,7 @@ export interface SearchParams {
 // Fetch all sweets (supports optional filtering)
 export const getSweets = async (params: SearchParams = {}) => {
     // If we have filters, use the /search endpoint, otherwise use /
-    const endpoint = Object.keys(params).length > 0 ? '/sweets/search' : '/sweets';
+    const endpoint = Object.keys(params).length > 0 ? '/api/sweets/search' : '/api/sweets';
     
     const response = await api.get<Sweet[]>(endpoint, { params });
     return response.data;
@@ -26,20 +26,20 @@ export const getSweets = async (params: SearchParams = {}) => {
 
 // Purchase a sweet
 export const purchaseSweet = async (id: number) => {
-    const response = await api.post(`/sweets/${id}/purchase`);
+    const response = await api.post(`/api/sweets/${id}/purchase`);
     return response.data;
 };
 
 export const createSweet = async (data: Omit<Sweet, 'id'>) => {
-    const response = await api.post('/sweets/', data);
+    const response = await api.post('/api/sweets/', data);
     return response.data;
 };
 
 export const deleteSweet = async (id: number) => {
-    await api.delete(`/sweets/${id}`);
+    await api.delete(`/api/sweets/${id}`);
 };
 
 export const restockSweet = async (id: number, amount: number) => {
-    const response = await api.post(`/sweets/${id}/restock`, { amount });
+    const response = await api.post(`/api/sweets/${id}/restock`, { amount });
     return response.data;
 };

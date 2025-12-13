@@ -3,7 +3,7 @@ from app.main import app
 
 def test_register_user(client):
     response = client.post(
-        "/auth/register",
+        "/api/auth/register",
         json={"email": "test@example.com", "password": "password123"},
     )
     assert response.status_code == 200
@@ -18,14 +18,14 @@ def test_register_user(client):
 def test_login_user(client):
     # 1. Create a user first
     client.post(
-        "/auth/register",
+        "/api/auth/register",
         json={"email": "login_test@example.com", "password": "password123"},
     )
     
     # 2. Try to login
     # OAuth2 spec usually requires form-data (username/password), not JSON
     response = client.post(
-        "/auth/login",
+        "/api/auth/login",
         data={"username": "login_test@example.com", "password": "password123"},
         headers={"content-type": "application/x-www-form-urlencoded"}
     )
