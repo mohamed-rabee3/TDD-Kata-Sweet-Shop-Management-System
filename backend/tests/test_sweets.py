@@ -110,6 +110,223 @@ def test_restock_sweet(client, test_db):
     assert response.json()["quantity"] == 15 # 5 + 10
 
 
+def test_update_sweet_as_admin(client, test_db):
+    # 1. Setup Admin & Sweet
+    client.post("/api/auth/register", json={"email": "admin3@test.com", "password": "pass"})
+    user = test_db.query(models.User).filter(models.User.email == "admin3@test.com").first()
+    user.is_admin = True
+    test_db.commit()
+    
+    login_res = client.post(
+        "/api/auth/login", 
+        data={"username": "admin3@test.com", "password": "pass"},
+        headers={"content-type": "application/x-www-form-urlencoded"}
+    )
+    token = login_res.json()["access_token"]
+    
+    # Create a sweet first
+    create_res = client.post(
+        "/api/sweets",
+        json={"name": "Original Candy", "category": "Hard", "price": 1.5, "quantity": 20},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    sweet_id = create_res.json()["id"]
+    
+    # 2. Update the sweet
+    response = client.put(
+        f"/api/sweets/{sweet_id}",
+        json={
+            "name": "Updated Candy",
+            "price": 2.5,
+            "category": "Soft"
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    
+    # 3. Verify
+    assert response.status_code == 200
+    data = response.json()
+    assert data["name"] == "Updated Candy"
+    assert data["price"] == 2.5
+    assert data["category"] == "Soft"
+    assert data["quantity"] == 20  # Quantity should remain unchanged if not provided
+    
+    # 4. Verify in DB
+    updated_sweet = test_db.query(models.Sweet).filter(models.Sweet.id == sweet_id).first()
+    assert updated_sweet.name == "Updated Candy"
+    assert updated_sweet.price == 2.5
+    assert updated_sweet.category == "Soft"
+
+
+def test_update_sweet_as_normal_user_fails(client, test_db):
+    # 1. Setup: Create admin to create sweet, then normal user to try updating
+    client.post("/api/auth/register", json={"email": "admin4@test.com", "password": "pass"})
+    admin_user = test_db.query(models.User).filter(models.User.email == "admin4@test.com").first()
+    admin_user.is_admin = True
+    test_db.commit()
+    
+    admin_login = client.post(
+        "/api/auth/login", 
+        data={"username": "admin4@test.com", "password": "pass"},
+        headers={"content-type": "application/x-www-form-urlencoded"}
+    )
+    admin_token = admin_login.json()["access_token"]
+    
+    # Create a sweet as admin
+    create_res = client.post(
+        "/api/sweets",
+        json={"name": "Protected Candy", "category": "Hard", "price": 1.0, "quantity": 10},
+        headers={"Authorization": f"Bearer {admin_token}"}
+    )
+    sweet_id = create_res.json()["id"]
+    
+    # 2. Register and login as normal user
+    client.post("/api/auth/register", json={"email": "user2@test.com", "password": "pass"})
+    user_login = client.post(
+        "/api/auth/login", 
+        data={"username": "user2@test.com", "password": "pass"},
+        headers={"content-type": "application/x-www-form-urlencoded"}
+    )
+    user_token = user_login.json()["access_token"]
+    
+    # 3. Try to Update Sweet (Should Fail)
+    response = client.put(
+        f"/api/sweets/{sweet_id}",
+        json={"name": "Hacked Candy", "price": 0.01},
+        headers={"Authorization": f"Bearer {user_token}"}
+    )
+    
+    assert response.status_code == 403  # Forbidden
+
+
+def test_update_sweet_not_found(client, test_db):
+    # 1. Setup Admin
+    client.post("/api/auth/register", json={"email": "admin5@test.com", "password": "pass"})
+    user = test_db.query(models.User).filter(models.User.email == "admin5@test.com").first()
+    user.is_admin = True
+    test_db.commit()
+    
+    login_res = client.post(
+        "/api/auth/login", 
+        data={"username": "admin5@test.com", "password": "pass"},
+        headers={"content-type": "application/x-www-form-urlencoded"}
+    )
+    token = login_res.json()["access_token"]
+    
+    # 2. Try to Update Non-existent Sweet
+    response = client.put(
+        "/api/sweets/99999",
+        json={"name": "Ghost Candy"},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Sweet not found"
+
+
+def test_delete_sweet_as_admin(client, test_db):
+    # 1. Setup Admin & Sweet
+    client.post("/api/auth/register", json={"email": "admin6@test.com", "password": "pass"})
+    user = test_db.query(models.User).filter(models.User.email == "admin6@test.com").first()
+    user.is_admin = True
+    test_db.commit()
+    
+    login_res = client.post(
+        "/api/auth/login", 
+        data={"username": "admin6@test.com", "password": "pass"},
+        headers={"content-type": "application/x-www-form-urlencoded"}
+    )
+    token = login_res.json()["access_token"]
+    
+    # Create a sweet first
+    create_res = client.post(
+        "/api/sweets",
+        json={"name": "To Be Deleted", "category": "Hard", "price": 1.0, "quantity": 5},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    sweet_id = create_res.json()["id"]
+    
+    # 2. Delete the sweet
+    response = client.delete(
+        f"/api/sweets/{sweet_id}",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    
+    # 3. Verify deletion (204 No Content)
+    assert response.status_code == 204
+    
+    # 4. Verify sweet is gone from DB
+    deleted_sweet = test_db.query(models.Sweet).filter(models.Sweet.id == sweet_id).first()
+    assert deleted_sweet is None
+
+
+def test_delete_sweet_as_normal_user_fails(client, test_db):
+    # 1. Setup: Create admin to create sweet, then normal user to try deleting
+    client.post("/api/auth/register", json={"email": "admin7@test.com", "password": "pass"})
+    admin_user = test_db.query(models.User).filter(models.User.email == "admin7@test.com").first()
+    admin_user.is_admin = True
+    test_db.commit()
+    
+    admin_login = client.post(
+        "/api/auth/login", 
+        data={"username": "admin7@test.com", "password": "pass"},
+        headers={"content-type": "application/x-www-form-urlencoded"}
+    )
+    admin_token = admin_login.json()["access_token"]
+    
+    # Create a sweet as admin
+    create_res = client.post(
+        "/api/sweets",
+        json={"name": "Protected Sweet", "category": "Hard", "price": 1.0, "quantity": 10},
+        headers={"Authorization": f"Bearer {admin_token}"}
+    )
+    sweet_id = create_res.json()["id"]
+    
+    # 2. Register and login as normal user
+    client.post("/api/auth/register", json={"email": "user3@test.com", "password": "pass"})
+    user_login = client.post(
+        "/api/auth/login", 
+        data={"username": "user3@test.com", "password": "pass"},
+        headers={"content-type": "application/x-www-form-urlencoded"}
+    )
+    user_token = user_login.json()["access_token"]
+    
+    # 3. Try to Delete Sweet (Should Fail)
+    response = client.delete(
+        f"/api/sweets/{sweet_id}",
+        headers={"Authorization": f"Bearer {user_token}"}
+    )
+    
+    assert response.status_code == 403  # Forbidden
+    
+    # 4. Verify sweet still exists
+    sweet = test_db.query(models.Sweet).filter(models.Sweet.id == sweet_id).first()
+    assert sweet is not None
+    assert sweet.name == "Protected Sweet"
+
+
+def test_delete_sweet_not_found(client, test_db):
+    # 1. Setup Admin
+    client.post("/api/auth/register", json={"email": "admin8@test.com", "password": "pass"})
+    user = test_db.query(models.User).filter(models.User.email == "admin8@test.com").first()
+    user.is_admin = True
+    test_db.commit()
+    
+    login_res = client.post(
+        "/api/auth/login", 
+        data={"username": "admin8@test.com", "password": "pass"},
+        headers={"content-type": "application/x-www-form-urlencoded"}
+    )
+    token = login_res.json()["access_token"]
+    
+    # 2. Try to Delete Non-existent Sweet
+    response = client.delete(
+        "/api/sweets/99999",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Sweet not found"
 
 
 def test_get_sweets_list(client, test_db):

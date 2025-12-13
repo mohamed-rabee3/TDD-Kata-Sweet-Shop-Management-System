@@ -260,11 +260,11 @@ This report provides a comprehensive analysis of the Sweet Shop Management Syste
 
 ### 4.1 Critical Missing Features
 
-1. **API Route Prefix Mismatch** ❌
+<!-- 1. **API Route Prefix Mismatch** ❌
    - **Issue:** All routes are `/auth/*` and `/sweets/*` instead of `/api/auth/*` and `/api/sweets/*`
    - **Impact:** Doesn't match requirement specification
    - **Location:** `backend/app/routers/auth.py`, `backend/app/routers/sweets.py`
-   - **Fix Required:** Add `/api` prefix to router prefixes or use FastAPI APIRouter with prefix
+   - **Fix Required:** Add `/api` prefix to router prefixes or use FastAPI APIRouter with prefix -->
 
 2. **Admin Update/Edit Sweet Functionality** ❌
    - **Issue:** Backend has `PUT /sweets/{id}` endpoint, but no frontend UI to use it
