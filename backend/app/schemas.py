@@ -52,3 +52,8 @@ class SweetResponse(SweetBase):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+# Add to backend/app/schemas.py
+class SweetRestock(BaseModel):
+    amount: int

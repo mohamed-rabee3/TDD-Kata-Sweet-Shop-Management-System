@@ -2,9 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .routers import auth  # Add this import
+from .routers import auth, sweets # <-- Import sweets
 
 app = FastAPI(title="Sweet Shop API")
-
+app.include_router(auth.router)
+app.include_router(sweets.router)
 # Configure CORS (Cross-Origin Resource Sharing)
 # This allows our React frontend (running on a different port) to talk to the backend
 origins = [
