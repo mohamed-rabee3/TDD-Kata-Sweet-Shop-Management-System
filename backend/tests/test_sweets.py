@@ -108,3 +108,45 @@ def test_restock_sweet(client, test_db):
     
     assert response.status_code == 200
     assert response.json()["quantity"] == 15 # 5 + 10
+
+
+
+
+def test_get_sweets_list(client, test_db):
+    # 1. Setup: Insert some sweets directly into DB
+    sweet1 = models.Sweet(name="Test Chocolate", category="Chocolate", price=5.0, quantity=10)
+    sweet2 = models.Sweet(name="Test Gummy", category="Gummy", price=2.0, quantity=20)
+    test_db.add_all([sweet1, sweet2])
+    test_db.commit()
+
+    # 2. Get List (No Token needed)
+    response = client.get("/sweets")
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 2
+    assert data[0]["name"] == "Test Chocolate"
+
+def test_search_sweets(client, test_db):
+    # 1. Setup: Insert varied data
+    s1 = models.Sweet(name="Dark Chocolate", category="Chocolate", price=10.0, quantity=10)
+    s2 = models.Sweet(name="White Chocolate", category="Chocolate", price=10.0, quantity=10)
+    s3 = models.Sweet(name="Sour Worms", category="Gummy", price=2.0, quantity=50)
+    test_db.add_all([s1, s2, s3])
+    test_db.commit()
+
+    # 2. Search by Name (partial match)
+    res_name = client.get("/sweets/search?q=Dark")
+    assert res_name.status_code == 200
+    assert len(res_name.json()) == 1
+    assert res_name.json()[0]["name"] == "Dark Chocolate"
+
+    # 3. Search by Category
+    res_cat = client.get("/sweets/search?category=Gummy")
+    assert len(res_cat.json()) == 1
+    assert res_cat.json()[0]["name"] == "Sour Worms"
+
+    # 4. Search by Price Range
+    res_price = client.get("/sweets/search?price_max=5.0")
+    assert len(res_price.json()) == 1
+    assert res_price.json()[0]["name"] == "Sour Worms"

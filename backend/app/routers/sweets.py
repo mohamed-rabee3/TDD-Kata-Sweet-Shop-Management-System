@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from typing import Optional
 
 from app import database, models, schemas, dependencies
 
@@ -77,3 +78,41 @@ def restock_sweet(
     db.commit()
     db.refresh(sweet)
     return sweet
+
+
+# 5. Search Sweets (Public)
+# URL: /api/sweets/search?q=...&category=...
+@router.get("/search", response_model=List[schemas.SweetResponse])
+def search_sweets(
+    q: Optional[str] = None,
+    category: Optional[str] = None,
+    price_min: Optional[float] = None,
+    price_max: Optional[float] = None,
+    db: Session = Depends(database.get_db)
+):
+    query = db.query(models.Sweet)
+    
+    if q:
+        # ILIKE is case-insensitive (sqlite supports it natively or via lower())
+        query = query.filter(models.Sweet.name.ilike(f"%{q}%"))
+    
+    if category:
+        query = query.filter(models.Sweet.category.ilike(f"%{category}%"))
+        
+    if price_min is not None:
+        query = query.filter(models.Sweet.price >= price_min)
+        
+    if price_max is not None:
+        query = query.filter(models.Sweet.price <= price_max)
+        
+    return query.all()
+
+# 6. List All Sweets (Public)
+@router.get("/", response_model=List[schemas.SweetResponse])
+def read_sweets(
+    skip: int = 0, 
+    limit: int = 100, 
+    db: Session = Depends(database.get_db)
+):
+    sweets = db.query(models.Sweet).offset(skip).limit(limit).all()
+    return sweets
