@@ -150,3 +150,59 @@ def test_search_sweets(client, test_db):
     res_price = client.get("/sweets/search?price_max=5.0")
     assert len(res_price.json()) == 1
     assert res_price.json()[0]["name"] == "Sour Worms"
+
+
+def test_purchase_sweet_success(client, test_db):
+    # 1. Setup: User and Sweet
+    client.post("/auth/register", json={"email": "buyer@test.com", "password": "pass"})
+    login_res = client.post(
+        "/auth/login", 
+        data={"username": "buyer@test.com", "password": "pass"},
+        headers={"content-type": "application/x-www-form-urlencoded"}
+    )
+    token = login_res.json()["access_token"]
+    
+    # Create sweet directly in DB with 5 items
+    sweet = models.Sweet(name="Buy Me", category="Treat", price=1.0, quantity=5)
+    test_db.add(sweet)
+    test_db.commit()
+    test_db.refresh(sweet)
+    
+    # 2. Purchase 1 item
+    response = client.post(
+        f"/sweets/{sweet.id}/purchase",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    
+    # 3. Verify
+    assert response.status_code == 200
+    assert response.json()["message"] == "Purchase successful"
+    
+    # FIX: Re-query the object instead of refreshing the old one
+    updated_sweet = test_db.query(models.Sweet).filter(models.Sweet.id == sweet.id).first()
+    assert updated_sweet.quantity == 4 # Was 5, now 4
+
+def test_purchase_out_of_stock(client, test_db):
+    # 1. Setup: User and Sweet with 0 Quantity
+    client.post("/auth/register", json={"email": "late@test.com", "password": "pass"})
+    login_res = client.post(
+        "/auth/login", 
+        data={"username": "late@test.com", "password": "pass"},
+        headers={"content-type": "application/x-www-form-urlencoded"}
+    )
+    token = login_res.json()["access_token"]
+    
+    sweet = models.Sweet(name="Empty", category="Treat", price=1.0, quantity=0)
+    test_db.add(sweet)
+    test_db.commit()
+    test_db.refresh(sweet)
+    
+    # 2. Try to Purchase
+    response = client.post(
+        f"/sweets/{sweet.id}/purchase",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    
+    # 3. Verify Failure
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Out of stock"

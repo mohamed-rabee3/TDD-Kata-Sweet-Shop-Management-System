@@ -116,3 +116,29 @@ def read_sweets(
 ):
     sweets = db.query(models.Sweet).offset(skip).limit(limit).all()
     return sweets
+
+
+
+# 7. Purchase Sweet (Protected User Action)
+@router.post("/{sweet_id}/purchase")
+def purchase_sweet(
+    sweet_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(dependencies.get_current_active_user)
+):
+    # 1. Lock the row (Optional for SQLite, but good practice in Postgres: with_for_update())
+    # For this Kata, simple retrieval is fine.
+    sweet = db.query(models.Sweet).filter(models.Sweet.id == sweet_id).first()
+    
+    if not sweet:
+        raise HTTPException(status_code=404, detail="Sweet not found")
+    
+    # 2. Check Inventory
+    if sweet.quantity < 1:
+        raise HTTPException(status_code=400, detail="Out of stock")
+    
+    # 3. Decrement & Save
+    sweet.quantity -= 1
+    db.commit()
+    
+    return {"message": "Purchase successful", "remaining_quantity": sweet.quantity}
