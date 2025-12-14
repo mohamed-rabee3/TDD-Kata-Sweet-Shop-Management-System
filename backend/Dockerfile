@@ -1,3 +1,9 @@
+# Dockerfile for Sweet Shop Backend (FastAPI)
+# 
+# Build instructions:
+#   From the backend directory: docker build -t sweet-shop-backend .
+#   Or from root: docker build -f backend/Dockerfile -t sweet-shop-backend backend/
+#
 # Use Python 3.11 slim image for smaller size
 FROM python:3.11-slim
 
@@ -16,14 +22,17 @@ RUN apt-get update && apt-get install -y \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements file
-COPY app/requirements.txt .
+# Copy requirements file first (for better layer caching)
+# IMPORTANT: Build this Dockerfile from the 'backend' directory:
+#   cd backend && docker build -t sweet-shop-backend .
+COPY app/requirements.txt ./requirements.txt
 
 # Install Python dependencies
 RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+    pip install -r requirements.txt && \
+    rm requirements.txt
 
-# Copy application code (backend directory structure)
+# Copy the rest of the application code
 COPY . .
 
 # Create directory for database (if using SQLite)
