@@ -50,5 +50,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # Alembic runs from /app (where alembic.ini is located)
 # Uvicorn runs with app.main:app since we're in /app and app is a package
 # Railway provides PORT environment variable, default to 8000 if not set
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Use exec form to ensure proper signal handling
+CMD sh -c "cd /app && echo 'Running migrations...' && alembic upgrade head && PORT=\${PORT:-8000} && echo \"Starting server on port \$PORT\" && uvicorn app.main:app --host 0.0.0.0 --port \$PORT"
 
