@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { loginUser } from '../api/auth';
+import { useResponsive } from '../hooks/useResponsive';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
+    const { isMobile, isTablet } = useResponsive();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -41,22 +44,22 @@ const Login: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '20px',
+            padding: isMobile ? '15px' : '20px',
             overflowY: 'auto'
         }}>
             <div style={{
                 maxWidth: '450px',
                 width: '100%',
                 background: 'white',
-                borderRadius: '16px',
-                padding: '40px',
+                borderRadius: isMobile ? '12px' : '16px',
+                padding: isMobile ? '25px' : isTablet ? '35px' : '40px',
                 boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
             }}>
-                <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                    <div style={{ fontSize: '4rem', marginBottom: '10px' }}>🍬</div>
+                <div style={{ textAlign: 'center', marginBottom: isMobile ? '20px' : '30px' }}>
+                    <div style={{ fontSize: isMobile ? '3rem' : '4rem', marginBottom: '10px' }}>🍬</div>
                     <h2 style={{
                         margin: 0,
-                        fontSize: '2rem',
+                        fontSize: isMobile ? '1.5rem' : isTablet ? '1.75rem' : '2rem',
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
@@ -64,7 +67,11 @@ const Login: React.FC = () => {
                     }}>
                         Welcome Back!
                     </h2>
-                    <p style={{ color: '#666', marginTop: '10px' }}>Sign in to your Sweet Shop account</p>
+                    <p style={{ 
+                        color: '#666', 
+                        marginTop: '10px',
+                        fontSize: isMobile ? '0.85rem' : '1rem'
+                    }}>Sign in to your Sweet Shop account</p>
                 </div>
 
                 {error && (
@@ -129,31 +136,69 @@ const Login: React.FC = () => {
                         }}>
                             🔒 Password
                         </label>
-                        <input 
-                            type="password" 
-                            value={password} 
-                            onChange={(e) => setPassword(e.target.value)} 
-                            required 
-                            placeholder="Enter your password"
-                            style={{
-                                width: '100%',
-                                padding: '12px 15px',
-                                border: '2px solid #e0e0e0',
-                                borderRadius: '8px',
-                                fontSize: '1rem',
-                                transition: 'all 0.3s ease',
-                                outline: 'none',
-                                boxSizing: 'border-box'
-                            }}
-                            onFocus={(e) => {
-                                e.currentTarget.style.borderColor = '#667eea';
-                                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
-                            }}
-                            onBlur={(e) => {
-                                e.currentTarget.style.borderColor = '#e0e0e0';
-                                e.currentTarget.style.boxShadow = 'none';
-                            }}
-                        />
+                        <div style={{ position: 'relative' }}>
+                            <input 
+                                type={showPassword ? 'text' : 'password'} 
+                                value={password} 
+                                onChange={(e) => setPassword(e.target.value)} 
+                                required 
+                                placeholder="Enter your password"
+                                style={{
+                                    width: '100%',
+                                    padding: '12px 45px 12px 15px',
+                                    border: '2px solid #e0e0e0',
+                                    borderRadius: '8px',
+                                    fontSize: '1rem',
+                                    transition: 'all 0.3s ease',
+                                    outline: 'none',
+                                    boxSizing: 'border-box'
+                                }}
+                                onFocus={(e) => {
+                                    e.currentTarget.style.borderColor = '#667eea';
+                                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                                }}
+                                onBlur={(e) => {
+                                    e.currentTarget.style.borderColor = '#e0e0e0';
+                                    e.currentTarget.style.boxShadow = 'none';
+                                }}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: '12px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    padding: '5px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '1.2rem',
+                                    color: '#666',
+                                    transition: 'all 0.2s ease',
+                                    minWidth: '30px',
+                                    minHeight: '30px',
+                                    borderRadius: '4px'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.color = '#667eea';
+                                    e.currentTarget.style.backgroundColor = 'rgba(102, 126, 234, 0.1)';
+                                    e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.color = '#666';
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                    e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                                }}
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                            >
+                                {showPassword ? '👁️' : '🙈'}
+                            </button>
+                        </div>
                     </div>
                     <button 
                         type="submit" 

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import type { ToastType } from '../hooks/useToast';
+import { useResponsive } from '../hooks/useResponsive';
 
 export interface ToastProps {
     message: string;
@@ -10,6 +11,8 @@ export interface ToastProps {
 }
 
 const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onClose, duration = 3000 }) => {
+    const { isMobile } = useResponsive();
+    
     useEffect(() => {
         if (isVisible) {
             const timer = setTimeout(() => {
@@ -51,19 +54,21 @@ const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onClose, durati
         <div
             style={{
                 position: 'fixed',
-                top: '20px',
-                right: '20px',
+                top: isMobile ? '10px' : '20px',
+                right: isMobile ? '10px' : '20px',
+                left: isMobile ? '10px' : 'auto',
                 zIndex: 10000,
-                minWidth: '300px',
-                maxWidth: '500px',
-                padding: '16px 20px',
+                minWidth: isMobile ? 'auto' : '300px',
+                maxWidth: isMobile ? 'calc(100% - 20px)' : '500px',
+                width: isMobile ? 'calc(100% - 20px)' : 'auto',
+                padding: isMobile ? '12px 16px' : '16px 20px',
                 backgroundColor: getBackgroundColor(),
                 color: 'white',
-                borderRadius: '12px',
+                borderRadius: isMobile ? '10px' : '12px',
                 boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px',
+                gap: isMobile ? '10px' : '12px',
                 animation: 'slideIn 0.3s ease-out',
                 cursor: 'pointer'
             }}
@@ -77,8 +82,12 @@ const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onClose, durati
                 e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
             }}
         >
-            <span style={{ fontSize: '1.5rem' }}>{getIcon()}</span>
-            <span style={{ flex: 1, fontWeight: '500', fontSize: '1rem' }}>{message}</span>
+            <span style={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }}>{getIcon()}</span>
+            <span style={{ 
+                flex: 1, 
+                fontWeight: '500', 
+                fontSize: isMobile ? '0.9rem' : '1rem' 
+            }}>{message}</span>
             <button
                 onClick={(e) => {
                     e.stopPropagation();
@@ -111,11 +120,11 @@ const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onClose, durati
             <style>{`
                 @keyframes slideIn {
                     from {
-                        transform: translateX(100%);
+                        transform: ${isMobile ? 'translateY(-100%)' : 'translateX(100%)'};
                         opacity: 0;
                     }
                     to {
-                        transform: translateX(0);
+                        transform: translateX(0) translateY(0);
                         opacity: 1;
                     }
                 }

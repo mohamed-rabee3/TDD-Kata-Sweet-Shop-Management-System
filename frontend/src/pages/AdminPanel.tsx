@@ -4,11 +4,13 @@ import { useAuth } from '../context/AuthContext';
 import { getSweets, createSweet, deleteSweet, restockSweet, updateSweet, type Sweet } from '../api/sweets';
 import Toast from '../components/Toast';
 import { useToast } from '../hooks/useToast';
+import { useResponsive } from '../hooks/useResponsive';
 
 const AdminPanel: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { toast, showSuccess, showError, hideToast } = useToast();
+    const { isMobile, isTablet, isLaptop } = useResponsive();
     const [sweets, setSweets] = useState<Sweet[]>([]);
     const [loading, setLoading] = useState(false);
     
@@ -161,31 +163,33 @@ const AdminPanel: React.FC = () => {
             right: 0,
             bottom: 0,
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            padding: '20px',
+            padding: isMobile ? '10px' : '20px',
             overflowY: 'auto'
         }}>
             <div style={{
                 maxWidth: '1400px',
                 margin: '0 auto',
                 background: 'white',
-                borderRadius: '16px',
+                borderRadius: isMobile ? '12px' : '16px',
                 boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                padding: '30px',
-                minHeight: 'calc(100vh - 40px)'
+                padding: isMobile ? '15px' : isTablet ? '20px' : '30px',
+                minHeight: isMobile ? 'calc(100vh - 20px)' : 'calc(100vh - 40px)'
             }}>
                 {/* Header */}
                 <div style={{
                     display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
                     justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '30px',
-                    paddingBottom: '20px',
-                    borderBottom: '2px solid #f0f0f0'
+                    alignItems: isMobile ? 'flex-start' : 'center',
+                    marginBottom: isMobile ? '20px' : '30px',
+                    paddingBottom: isMobile ? '15px' : '20px',
+                    borderBottom: '2px solid #f0f0f0',
+                    gap: isMobile ? '15px' : '0'
                 }}>
                     <div>
                         <h1 style={{
                             margin: 0,
-                            fontSize: '2.5rem',
+                            fontSize: isMobile ? '1.5rem' : isTablet ? '2rem' : '2.5rem',
                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
@@ -193,14 +197,18 @@ const AdminPanel: React.FC = () => {
                         }}>
                             ⚙️ Admin Inventory Management
                         </h1>
-                        <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '0.9rem' }}>
+                        <p style={{ 
+                            margin: '5px 0 0 0', 
+                            color: '#666', 
+                            fontSize: isMobile ? '0.8rem' : '0.9rem' 
+                        }}>
                             Manage your sweet shop inventory
                         </p>
                     </div>
                     <button 
                         onClick={() => navigate('/dashboard')} 
                         style={{
-                            padding: '10px 20px',
+                            padding: isMobile ? '8px 12px' : '10px 20px',
                             backgroundColor: '#6c757d',
                             color: 'white',
                             border: 'none',
@@ -208,7 +216,9 @@ const AdminPanel: React.FC = () => {
                             cursor: 'pointer',
                             fontWeight: '500',
                             transition: 'all 0.3s ease',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                            fontSize: isMobile ? '0.85rem' : '1rem',
+                            width: isMobile ? '100%' : 'auto'
                         }}
                         onMouseOver={(e) => {
                             e.currentTarget.style.backgroundColor = '#5a6268';
@@ -226,19 +236,24 @@ const AdminPanel: React.FC = () => {
                 {/* Add Form */}
                 <div style={{
                     border: '2px solid #e0e0e0',
-                    padding: '25px',
-                    marginBottom: '30px',
+                    padding: isMobile ? '15px' : '25px',
+                    marginBottom: isMobile ? '20px' : '30px',
                     borderRadius: '12px',
                     background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
                     boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
                 }}>
-                    <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#333', fontSize: '1.5rem' }}>
+                    <h3 style={{ 
+                        marginTop: 0, 
+                        marginBottom: '20px', 
+                        color: '#333', 
+                        fontSize: isMobile ? '1.2rem' : '1.5rem' 
+                    }}>
                         ➕ Add New Sweet
                     </h3>
                     <form onSubmit={handleAdd} style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                        gap: '15px',
+                        gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gap: isMobile ? '10px' : '15px',
                         alignItems: 'end'
                     }}>
                         <input 
@@ -340,13 +355,14 @@ const AdminPanel: React.FC = () => {
                                 backgroundColor: '#28a745',
                                 color: 'white',
                                 border: 'none',
-                                padding: '12px 25px',
+                                padding: isMobile ? '12px 15px' : '12px 25px',
                                 borderRadius: '8px',
                                 cursor: 'pointer',
                                 fontWeight: '600',
-                                fontSize: '1rem',
+                                fontSize: isMobile ? '0.9rem' : '1rem',
                                 transition: 'all 0.3s ease',
-                                boxShadow: '0 4px 6px rgba(40, 167, 69, 0.3)'
+                                boxShadow: '0 4px 6px rgba(40, 167, 69, 0.3)',
+                                gridColumn: isMobile ? '1 / -1' : 'auto'
                             }}
                             onMouseOver={(e) => {
                                 e.currentTarget.style.backgroundColor = '#218838';
@@ -376,17 +392,25 @@ const AdminPanel: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        zIndex: 1000
+                        zIndex: 1000,
+                        padding: isMobile ? '10px' : '20px'
                     }}>
                         <div style={{
                             background: 'white',
-                            padding: '30px',
+                            padding: isMobile ? '20px' : '30px',
                             borderRadius: '12px',
                             maxWidth: '500px',
-                            width: '90%',
-                            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+                            width: isMobile ? '95%' : '90%',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                            maxHeight: isMobile ? '90vh' : 'auto',
+                            overflowY: isMobile ? 'auto' : 'visible'
                         }}>
-                            <h2 style={{ marginTop: 0, marginBottom: '20px', color: '#333' }}>
+                            <h2 style={{ 
+                                marginTop: 0, 
+                                marginBottom: '20px', 
+                                color: '#333',
+                                fontSize: isMobile ? '1.2rem' : '1.5rem'
+                            }}>
                                 ✏️ Edit Sweet
                             </h2>
                             <form onSubmit={handleSaveEdit}>
@@ -501,13 +525,20 @@ const AdminPanel: React.FC = () => {
                     }}>
                         <div style={{
                             background: 'white',
-                            padding: '30px',
+                            padding: isMobile ? '20px' : '30px',
                             borderRadius: '12px',
                             maxWidth: '500px',
-                            width: '90%',
-                            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+                            width: isMobile ? '95%' : '90%',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                            maxHeight: isMobile ? '90vh' : 'auto',
+                            overflowY: isMobile ? 'auto' : 'visible'
                         }}>
-                            <h2 style={{ marginTop: 0, marginBottom: '15px', color: '#dc3545', fontSize: '1.5rem' }}>
+                            <h2 style={{ 
+                                marginTop: 0, 
+                                marginBottom: '15px', 
+                                color: '#dc3545', 
+                                fontSize: isMobile ? '1.2rem' : '1.5rem' 
+                            }}>
                                 ⚠️ Delete Sweet
                             </h2>
                             <p style={{ marginBottom: '25px', color: '#666', fontSize: '1rem', lineHeight: '1.5' }}>
@@ -585,13 +616,20 @@ const AdminPanel: React.FC = () => {
                     }}>
                         <div style={{
                             background: 'white',
-                            padding: '30px',
+                            padding: isMobile ? '20px' : '30px',
                             borderRadius: '12px',
                             maxWidth: '500px',
-                            width: '90%',
-                            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+                            width: isMobile ? '95%' : '90%',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                            maxHeight: isMobile ? '90vh' : 'auto',
+                            overflowY: isMobile ? 'auto' : 'visible'
                         }}>
-                            <h2 style={{ marginTop: 0, marginBottom: '15px', color: '#17a2b8', fontSize: '1.5rem' }}>
+                            <h2 style={{ 
+                                marginTop: 0, 
+                                marginBottom: '15px', 
+                                color: '#17a2b8', 
+                                fontSize: isMobile ? '1.2rem' : '1.5rem' 
+                            }}>
                                 ➕ Restock Sweet
                             </h2>
                             <p style={{ marginBottom: '20px', color: '#666', fontSize: '1rem', lineHeight: '1.5' }}>
@@ -690,29 +728,60 @@ const AdminPanel: React.FC = () => {
 
                 {/* Inventory Table */}
                 {loading ? (
-                    <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '20px' }}>🍬</div>
-                        <p style={{ fontSize: '1.2rem', color: '#666' }}>Loading inventory...</p>
+                    <div style={{ textAlign: 'center', padding: isMobile ? '40px 15px' : '60px 20px' }}>
+                        <div style={{ fontSize: isMobile ? '2rem' : '3rem', marginBottom: '20px' }}>🍬</div>
+                        <p style={{ fontSize: isMobile ? '1rem' : '1.2rem', color: '#666' }}>Loading inventory...</p>
                     </div>
                 ) : (
                     <div style={{
                         overflowX: 'auto',
                         borderRadius: '12px',
                         boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                        border: '1px solid #e0e0e0'
+                        border: '1px solid #e0e0e0',
+                        WebkitOverflowScrolling: 'touch'
                     }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isMobile ? '600px' : 'auto' }}>
                             <thead>
                                 <tr style={{
                                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                     color: 'white'
                                 }}>
-                                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>ID</th>
-                                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Name</th>
-                                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Category</th>
-                                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Price</th>
-                                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Stock</th>
-                                    <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Actions</th>
+                                    <th style={{ 
+                                        padding: isMobile ? '10px' : '15px', 
+                                        textAlign: 'left', 
+                                        fontWeight: '600',
+                                        fontSize: isMobile ? '0.85rem' : '1rem'
+                                    }}>ID</th>
+                                    <th style={{ 
+                                        padding: isMobile ? '10px' : '15px', 
+                                        textAlign: 'left', 
+                                        fontWeight: '600',
+                                        fontSize: isMobile ? '0.85rem' : '1rem'
+                                    }}>Name</th>
+                                    <th style={{ 
+                                        padding: isMobile ? '10px' : '15px', 
+                                        textAlign: 'left', 
+                                        fontWeight: '600',
+                                        fontSize: isMobile ? '0.85rem' : '1rem'
+                                    }}>Category</th>
+                                    <th style={{ 
+                                        padding: isMobile ? '10px' : '15px', 
+                                        textAlign: 'left', 
+                                        fontWeight: '600',
+                                        fontSize: isMobile ? '0.85rem' : '1rem'
+                                    }}>Price</th>
+                                    <th style={{ 
+                                        padding: isMobile ? '10px' : '15px', 
+                                        textAlign: 'left', 
+                                        fontWeight: '600',
+                                        fontSize: isMobile ? '0.85rem' : '1rem'
+                                    }}>Stock</th>
+                                    <th style={{ 
+                                        padding: isMobile ? '10px' : '15px', 
+                                        textAlign: 'left', 
+                                        fontWeight: '600',
+                                        fontSize: isMobile ? '0.85rem' : '1rem'
+                                    }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -738,31 +807,52 @@ const AdminPanel: React.FC = () => {
                                                 e.currentTarget.style.background = index % 2 === 0 ? '#fff' : '#f8f9fa';
                                             }}
                                         >
-                                            <td style={{ padding: '15px', fontWeight: '500' }}>{sweet.id}</td>
-                                            <td style={{ padding: '15px', fontWeight: '500' }}>{sweet.name}</td>
-                                            <td style={{ padding: '15px' }}>{sweet.category}</td>
-                                            <td style={{ padding: '15px', fontWeight: '600', color: '#667eea' }}>
+                                            <td style={{ 
+                                                padding: isMobile ? '10px' : '15px', 
+                                                fontWeight: '500',
+                                                fontSize: isMobile ? '0.85rem' : '1rem'
+                                            }}>{sweet.id}</td>
+                                            <td style={{ 
+                                                padding: isMobile ? '10px' : '15px', 
+                                                fontWeight: '500',
+                                                fontSize: isMobile ? '0.85rem' : '1rem'
+                                            }}>{sweet.name}</td>
+                                            <td style={{ 
+                                                padding: isMobile ? '10px' : '15px',
+                                                fontSize: isMobile ? '0.85rem' : '1rem'
+                                            }}>{sweet.category}</td>
+                                            <td style={{ 
+                                                padding: isMobile ? '10px' : '15px', 
+                                                fontWeight: '600', 
+                                                color: '#667eea',
+                                                fontSize: isMobile ? '0.85rem' : '1rem'
+                                            }}>
                                                 ${sweet.price.toFixed(2)}
                                             </td>
                                             <td style={{
-                                                padding: '15px',
+                                                padding: isMobile ? '10px' : '15px',
                                                 color: sweet.quantity < 5 ? '#dc3545' : sweet.quantity < 10 ? '#ffc107' : '#28a745',
-                                                fontWeight: '600'
+                                                fontWeight: '600',
+                                                fontSize: isMobile ? '0.85rem' : '1rem'
                                             }}>
                                                 {sweet.quantity}
                                             </td>
-                                            <td style={{ padding: '15px' }}>
-                                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                            <td style={{ padding: isMobile ? '10px' : '15px' }}>
+                                                <div style={{ 
+                                                    display: 'flex', 
+                                                    gap: isMobile ? '4px' : '8px', 
+                                                    flexWrap: 'wrap' 
+                                                }}>
                                                     <button 
                                                         onClick={() => handleStartEdit(sweet)}
                                                         style={{
-                                                            padding: '8px 15px',
+                                                            padding: isMobile ? '6px 10px' : '8px 15px',
                                                             backgroundColor: '#667eea',
                                                             color: 'white',
                                                             border: 'none',
                                                             borderRadius: '6px',
                                                             cursor: 'pointer',
-                                                            fontSize: '0.9rem',
+                                                            fontSize: isMobile ? '0.75rem' : '0.9rem',
                                                             fontWeight: '500',
                                                             transition: 'all 0.2s ease'
                                                         }}
@@ -780,13 +870,13 @@ const AdminPanel: React.FC = () => {
                                                     <button 
                                                         onClick={() => handleOpenRestock(sweet)}
                                                         style={{
-                                                            padding: '8px 15px',
+                                                            padding: isMobile ? '6px 10px' : '8px 15px',
                                                             backgroundColor: '#17a2b8',
                                                             color: 'white',
                                                             border: 'none',
                                                             borderRadius: '6px',
                                                             cursor: 'pointer',
-                                                            fontSize: '0.9rem',
+                                                            fontSize: isMobile ? '0.75rem' : '0.9rem',
                                                             fontWeight: '500',
                                                             transition: 'all 0.2s ease'
                                                         }}
@@ -804,13 +894,13 @@ const AdminPanel: React.FC = () => {
                                                     <button 
                                                         onClick={() => handleOpenDelete(sweet)}
                                                         style={{
-                                                            padding: '8px 15px',
+                                                            padding: isMobile ? '6px 10px' : '8px 15px',
                                                             backgroundColor: '#dc3545',
                                                             color: 'white',
                                                             border: 'none',
                                                             borderRadius: '6px',
                                                             cursor: 'pointer',
-                                                            fontSize: '0.9rem',
+                                                            fontSize: isMobile ? '0.75rem' : '0.9rem',
                                                             fontWeight: '500',
                                                             transition: 'all 0.2s ease'
                                                         }}

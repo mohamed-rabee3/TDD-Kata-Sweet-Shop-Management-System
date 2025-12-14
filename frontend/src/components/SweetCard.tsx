@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Sweet } from '../api/sweets';
+import { useResponsive } from '../hooks/useResponsive';
 
 interface SweetCardProps {
     sweet: Sweet;
@@ -7,14 +8,15 @@ interface SweetCardProps {
 }
 
 const SweetCard: React.FC<SweetCardProps> = ({ sweet, onPurchase }) => {
+    const { isMobile } = useResponsive();
     const isOutOfStock = sweet.quantity <= 0;
     const isLowStock = sweet.quantity > 0 && sweet.quantity < 5;
 
     return (
         <div style={{
             border: '2px solid #e0e0e0',
-            borderRadius: '12px',
-            padding: '20px',
+            borderRadius: isMobile ? '10px' : '12px',
+            padding: isMobile ? '15px' : '20px',
             background: 'white',
             boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
             transition: 'all 0.3s ease',
@@ -35,11 +37,11 @@ const SweetCard: React.FC<SweetCardProps> = ({ sweet, onPurchase }) => {
             {/* Stock Badge */}
             <div style={{
                 position: 'absolute',
-                top: '15px',
-                right: '15px',
-                padding: '5px 12px',
+                top: isMobile ? '10px' : '15px',
+                right: isMobile ? '10px' : '15px',
+                padding: isMobile ? '4px 8px' : '5px 12px',
                 borderRadius: '20px',
-                fontSize: '0.75rem',
+                fontSize: isMobile ? '0.65rem' : '0.75rem',
                 fontWeight: '600',
                 background: isOutOfStock ? '#dc3545' : isLowStock ? '#ffc107' : '#28a745',
                 color: 'white'
@@ -49,17 +51,17 @@ const SweetCard: React.FC<SweetCardProps> = ({ sweet, onPurchase }) => {
 
             {/* Sweet Icon */}
             <div style={{
-                fontSize: '3rem',
+                fontSize: isMobile ? '2.5rem' : '3rem',
                 textAlign: 'center',
-                marginBottom: '15px',
-                marginTop: '10px'
+                marginBottom: isMobile ? '12px' : '15px',
+                marginTop: isMobile ? '8px' : '10px'
             }}>
                 🍬
             </div>
 
             <h3 style={{
                 margin: '0 0 10px 0',
-                fontSize: '1.3rem',
+                fontSize: isMobile ? '1.1rem' : '1.3rem',
                 fontWeight: 'bold',
                 color: '#333',
                 textAlign: 'center'
@@ -68,28 +70,36 @@ const SweetCard: React.FC<SweetCardProps> = ({ sweet, onPurchase }) => {
             </h3>
 
             <div style={{
-                padding: '15px',
+                padding: isMobile ? '12px' : '15px',
                 background: '#f8f9fa',
                 borderRadius: '8px',
-                marginBottom: '15px'
+                marginBottom: isMobile ? '12px' : '15px'
             }}>
-                <p style={{ margin: '8px 0', color: '#666', fontSize: '0.9rem' }}>
+                <p style={{ 
+                    margin: isMobile ? '6px 0' : '8px 0', 
+                    color: '#666', 
+                    fontSize: isMobile ? '0.8rem' : '0.9rem' 
+                }}>
                     <strong style={{ color: '#333' }}>📁 Category:</strong> {sweet.category}
                 </p>
-                <p style={{ margin: '8px 0', color: '#666', fontSize: '0.9rem' }}>
+                <p style={{ 
+                    margin: isMobile ? '6px 0' : '8px 0', 
+                    color: '#666', 
+                    fontSize: isMobile ? '0.8rem' : '0.9rem' 
+                }}>
                     <strong style={{ color: '#333' }}>💰 Price:</strong> 
                     <span style={{ 
                         color: '#667eea', 
                         fontWeight: 'bold', 
-                        fontSize: '1.1rem',
+                        fontSize: isMobile ? '1rem' : '1.1rem',
                         marginLeft: '5px'
                     }}>
                         ${sweet.price.toFixed(2)}
                     </span>
                 </p>
                 <p style={{ 
-                    margin: '8px 0', 
-                    fontSize: '0.9rem',
+                    margin: isMobile ? '6px 0' : '8px 0', 
+                    fontSize: isMobile ? '0.8rem' : '0.9rem',
                     color: isOutOfStock ? '#dc3545' : isLowStock ? '#ffc107' : '#28a745',
                     fontWeight: '600'
                 }}>
@@ -102,16 +112,17 @@ const SweetCard: React.FC<SweetCardProps> = ({ sweet, onPurchase }) => {
                 disabled={isOutOfStock}
                 style={{
                     width: '100%',
-                    padding: '12px',
+                    padding: isMobile ? '10px' : '12px',
                     backgroundColor: isOutOfStock ? '#ccc' : '#667eea',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
                     cursor: isOutOfStock ? 'not-allowed' : 'pointer',
                     fontWeight: '600',
-                    fontSize: '1rem',
+                    fontSize: isMobile ? '0.9rem' : '1rem',
                     transition: 'all 0.3s ease',
-                    boxShadow: isOutOfStock ? 'none' : '0 4px 6px rgba(102, 126, 234, 0.3)'
+                    boxShadow: isOutOfStock ? 'none' : '0 4px 6px rgba(102, 126, 234, 0.3)',
+                    minHeight: isMobile ? '44px' : 'auto'
                 }}
                 onMouseEnter={(e) => {
                     if (!isOutOfStock) {

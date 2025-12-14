@@ -5,11 +5,13 @@ import { getSweets, purchaseSweet, type Sweet } from '../api/sweets';
 import SweetCard from '../components/SweetCard';
 import Toast from '../components/Toast';
 import { useToast } from '../hooks/useToast';
+import { useResponsive } from '../hooks/useResponsive';
 
 const Dashboard: React.FC = () => {
     const { logout, user } = useAuth();
     const navigate = useNavigate();
     const { toast, showSuccess, showError, hideToast } = useToast();
+    const { isMobile, isTablet, isLaptop, width } = useResponsive();
     const [sweets, setSweets] = useState<Sweet[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -81,31 +83,33 @@ const Dashboard: React.FC = () => {
             right: 0,
             bottom: 0,
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            padding: '20px',
+            padding: isMobile ? '10px' : '20px',
             overflowY: 'auto'
         }}>
             <div style={{
                 maxWidth: '1400px',
                 margin: '0 auto',
                 background: 'white',
-                borderRadius: '16px',
+                borderRadius: isMobile ? '12px' : '16px',
                 boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                padding: '30px',
-                minHeight: 'calc(100vh - 40px)'
+                padding: isMobile ? '15px' : isTablet ? '20px' : '30px',
+                minHeight: isMobile ? 'calc(100vh - 20px)' : 'calc(100vh - 40px)'
             }}>
                 {/* Header */}
                 <div style={{
                     display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
                     justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '30px',
-                    paddingBottom: '20px',
-                    borderBottom: '2px solid #f0f0f0'
+                    alignItems: isMobile ? 'flex-start' : 'center',
+                    marginBottom: isMobile ? '20px' : '30px',
+                    paddingBottom: isMobile ? '15px' : '20px',
+                    borderBottom: '2px solid #f0f0f0',
+                    gap: isMobile ? '15px' : '0'
                 }}>
                     <div>
                         <h1 style={{
                             margin: 0,
-                            fontSize: '2.5rem',
+                            fontSize: isMobile ? '1.75rem' : isTablet ? '2rem' : '2.5rem',
                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
@@ -113,11 +117,21 @@ const Dashboard: React.FC = () => {
                         }}>
                             🍬 Sweet Shop
                         </h1>
-                        <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '0.9rem' }}>
+                        <p style={{ 
+                            margin: '5px 0 0 0', 
+                            color: '#666', 
+                            fontSize: isMobile ? '0.8rem' : '0.9rem' 
+                        }}>
                             Your favorite treats, just a click away
                         </p>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: isMobile ? '8px' : '15px',
+                        flexWrap: 'wrap',
+                        width: isMobile ? '100%' : 'auto'
+                    }}>
                         {user?.is_admin && (
                             <button 
                                 onClick={() => navigate('/admin')} 
@@ -125,12 +139,14 @@ const Dashboard: React.FC = () => {
                                     backgroundColor: '#6c757d',
                                     color: 'white',
                                     border: 'none',
-                                    padding: '10px 20px',
+                                    padding: isMobile ? '8px 12px' : '10px 20px',
                                     borderRadius: '8px',
                                     cursor: 'pointer',
                                     fontWeight: '500',
                                     transition: 'all 0.3s ease',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                    fontSize: isMobile ? '0.85rem' : '1rem',
+                                    flex: isMobile ? '1 1 auto' : 'none'
                                 }}
                                 onMouseOver={(e) => {
                                     e.currentTarget.style.backgroundColor = '#5a6268';
@@ -146,13 +162,18 @@ const Dashboard: React.FC = () => {
                                 ⚙️ Admin Panel
                             </button>
                         )}
-                        <span style={{ color: '#333', fontWeight: '500' }}>
+                        <span style={{ 
+                            color: '#333', 
+                            fontWeight: '500',
+                            fontSize: isMobile ? '0.85rem' : '1rem',
+                            wordBreak: 'break-word'
+                        }}>
                             👤 {user?.sub}
                         </span>
                         <button 
                             onClick={logout} 
                             style={{
-                                padding: '10px 20px',
+                                padding: isMobile ? '8px 12px' : '10px 20px',
                                 backgroundColor: '#dc3545',
                                 color: 'white',
                                 border: 'none',
@@ -160,7 +181,9 @@ const Dashboard: React.FC = () => {
                                 cursor: 'pointer',
                                 fontWeight: '500',
                                 transition: 'all 0.3s ease',
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                fontSize: isMobile ? '0.85rem' : '1rem',
+                                flex: isMobile ? '1 1 auto' : 'none'
                             }}
                             onMouseOver={(e) => {
                                 e.currentTarget.style.backgroundColor = '#c82333';
@@ -178,16 +201,16 @@ const Dashboard: React.FC = () => {
 
                 {/* Search Bar */}
                 <form onSubmit={handleSearch} style={{
-                    marginBottom: '30px',
-                    padding: '25px',
+                    marginBottom: isMobile ? '20px' : '30px',
+                    padding: isMobile ? '15px' : '25px',
                     background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
                     borderRadius: '12px',
                     boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
                 }}>
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                        gap: '15px',
+                        gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gap: isMobile ? '10px' : '15px',
                         marginBottom: '15px'
                     }}>
                         <input 
@@ -283,20 +306,25 @@ const Dashboard: React.FC = () => {
                             }}
                         />
                     </div>
-                    <div style={{ display: 'flex', gap: '10px' }}>
+                    <div style={{ 
+                        display: 'flex', 
+                        gap: '10px',
+                        flexDirection: isMobile ? 'column' : 'row'
+                    }}>
                         <button 
                             type="submit" 
                             style={{
-                                padding: '12px 30px',
+                                padding: isMobile ? '12px 20px' : '12px 30px',
                                 backgroundColor: '#667eea',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '8px',
                                 cursor: 'pointer',
                                 fontWeight: '600',
-                                fontSize: '1rem',
+                                fontSize: isMobile ? '0.9rem' : '1rem',
                                 transition: 'all 0.3s ease',
-                                boxShadow: '0 4px 6px rgba(102, 126, 234, 0.3)'
+                                boxShadow: '0 4px 6px rgba(102, 126, 234, 0.3)',
+                                width: isMobile ? '100%' : 'auto'
                             }}
                             onMouseOver={(e) => {
                                 e.currentTarget.style.backgroundColor = '#5568d3';
@@ -315,15 +343,16 @@ const Dashboard: React.FC = () => {
                             type="button"
                             onClick={handleClearFilters}
                             style={{
-                                padding: '12px 30px',
+                                padding: isMobile ? '12px 20px' : '12px 30px',
                                 backgroundColor: '#6c757d',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '8px',
                                 cursor: 'pointer',
                                 fontWeight: '600',
-                                fontSize: '1rem',
-                                transition: 'all 0.3s ease'
+                                fontSize: isMobile ? '0.9rem' : '1rem',
+                                transition: 'all 0.3s ease',
+                                width: isMobile ? '100%' : 'auto'
                             }}
                             onMouseOver={(e) => {
                                 e.currentTarget.style.backgroundColor = '#5a6268';
@@ -352,8 +381,8 @@ const Dashboard: React.FC = () => {
                 ) : (
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                        gap: '25px'
+                        gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : isLaptop ? 'repeat(3, 1fr)' : 'repeat(auto-fill, minmax(280px, 1fr))',
+                        gap: isMobile ? '15px' : '25px'
                     }}>
                         {sweets.length === 0 ? (
                             <div style={{

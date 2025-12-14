@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { registerUser } from '../api/auth';
+import { useResponsive } from '../hooks/useResponsive';
 
 const Register: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const { isMobile, isTablet } = useResponsive();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,22 +32,22 @@ const Register: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '20px',
+            padding: isMobile ? '15px' : '20px',
             overflowY: 'auto'
         }}>
             <div style={{
                 maxWidth: '450px',
                 width: '100%',
                 background: 'white',
-                borderRadius: '16px',
-                padding: '40px',
+                borderRadius: isMobile ? '12px' : '16px',
+                padding: isMobile ? '25px' : isTablet ? '35px' : '40px',
                 boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
             }}>
-                <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                    <div style={{ fontSize: '4rem', marginBottom: '10px' }}>🍬</div>
+                <div style={{ textAlign: 'center', marginBottom: isMobile ? '20px' : '30px' }}>
+                    <div style={{ fontSize: isMobile ? '3rem' : '4rem', marginBottom: '10px' }}>🍬</div>
                     <h2 style={{
                         margin: 0,
-                        fontSize: '2rem',
+                        fontSize: isMobile ? '1.5rem' : isTablet ? '1.75rem' : '2rem',
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
@@ -53,7 +55,11 @@ const Register: React.FC = () => {
                     }}>
                         Join Sweet Shop!
                     </h2>
-                    <p style={{ color: '#666', marginTop: '10px' }}>Create your account to start shopping</p>
+                    <p style={{ 
+                        color: '#666', 
+                        marginTop: '10px',
+                        fontSize: isMobile ? '0.85rem' : '1rem'
+                    }}>Create your account to start shopping</p>
                 </div>
 
                 {error && (
