@@ -1,0 +1,72 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+backend/venv/
+backend/env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+backend/*.db
+backend/*.sqlite
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+backend/.pytest_cache/
+backend/htmlcov/
+
+# Environment files (will be provided at runtime)
+.env
+.env.local
+backend/.env
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+README*
+screenshots/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frontend (not needed for backend Docker image)
+frontend/
+node_modules/
+
+# Docker
+.dockerignore
+docker-compose.yml
+
+# Other
+API.md
+
